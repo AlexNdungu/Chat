@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+<!--The page title-->
+{% block title %}meChat::- Sign In{% endblock %}
+
+<!--The head-->
+{% block head %}
+
+<link rel="stylesheet" href="{% static '\Css\sign.css' %}">
+
+{% endblock %}
+
+
+<!--The body-->
+
+{% block body %}
+
+<div class="sign">
+
+    <!--Github-->
+    <a href="{% url "social:begin" "github" %}">
+
+        <div class="sign1">
+
+            <div class="git">
+    
+                <img src="{% static '\Images\github.png' %}" alt="">
+        
+            </div>
+    
+            <span>GitHub</span>
+        
+    
+        </div>
+
+    </a>
+    
+
+    <!--Linkedin-->
+
+    <a href="{% url "social:begin" "linkedin-oauth2" %}">
+
+        <div class="sign1">
+
+            <div class="link">
+    
+                <img src="{% static '\Images\linkedin.png' %}" alt="">
+        
+            </div>
+    
+            <span>LinkedIn</span>
+        
+        </div>
+
+    </a>
+    
+
+</div>
+
+
+{% endblock %}

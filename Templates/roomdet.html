@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+<!--The page title-->
+{% block title %}meChat::- {{room.name}}{% endblock %}
+
+<!--The head-->
+{% block head %}
+
+<link rel="stylesheet" href="{% static '\Css\roomdet.css' %}">
+<link rel="stylesheet" href="{% static '\Css\rooms.css' %}">
+
+<!--The ajax link-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js" integrity="sha512-n/4gHW3atM3QqRcbCn6ewmpxcLAHGaDjpEBu4xZd47N0W2oQ+6q7oc3PXstrJYXcbNU1OHdQ1T7pAP+gi5Yu8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+
+{% endblock %}
+
+
+<!--The body-->
+
+{% block body %}
+
+<div class="headRoom">
+
+    <h2>{{room.name}}</h2>
+
+</div>
+
+
+
+
+<!--The oom content-->
+
+<!--The mesage section-->
+
+<div class="allMessageBig">
+
+    <!--The inner message section-->
+    <div class="innerMess" id="chat-messages" >
+
+        {% for message in messages %}
+        <!--Individual message-->
+        <div class="indMess">
+
+            <!--The username-->
+            <div class="user">
+                <span>{{message.user.username}}</span>
+            </div>
+
+            <!--The message-->
+            <div class="letSeeChat">
+                <p>{{message.content}}</p>
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+
+    <!--Create a form-->
+    <div class="form">
+
+        <form method="post" action="." class="innerForm" >
+
+            {% csrf_token %}
+
+            <input type="text" name="content" placeholder="Your Message..." id="chat-message-input" >
+
+            <button type="submit" id="chat-message-submit" >Send</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{room.slug | json_script:"json-roomname"}}
+
+    {{request.user.username | json_script:"json-username"}}
+
+    <script>
+
+        //Room name
+        const roomName = JSON.parse(document.getElementById('json-roomname').textContent);
+
+        //username
+        const userName = JSON.parse(document.getElementById('json-username').textContent);
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/'
+            + roomName
+            +'/'
+        );
+
+        chatSocket.onmessage = function(e){
+            console.log('onmessage')
+
+            const data = JSON.parse(e.data);
+
+            if (data.message){
+
+                let html = `
+                <div class="indMess">
+
+                    <!--The username-->
+                    <div class="user">
+                        <span>${data.username}</span>
+                    </div>
+        
+                    <!--The message-->
+                    <div class="letSeeChat">
+                        <p>${data.message}</p>
+                    </div>
+        
+                </div>`;
+
+                document.querySelector('#chat-messages').innerHTML += html;
+
+            }
+            else{
+                alert('The message was empty');
+            }
+
+        };
+
+        chatSocket.onclose = function(e){
+            console.log('onclose')
+        };
+
+
+        //We submit the message
+
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+
+            e.preventDefault();
+            //the message value
+            const messageInputDom = document.querySelector('#chat-message-input');
+
+            const message = messageInputDom.value;
+
+            chatSocket.send(JSON.stringify({
+                'message':message,
+                'username':userName,
+                'room':roomName
+            }));
+
+            messageInputDom.value = '';
+
+            return false;
+        }
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+<!--The page title-->
+{% block title %}meChat::- Rooms{% endblock %}
+
+<!--The head-->
+{% block head %}
+
+<link rel="stylesheet" href="{% static '\Css\rooms.css' %}">
+
+{% endblock %}
+
+
+<!--The body-->
+
+{% block body %}
+
+<div class="headRoom">
+
+    <h2>Rooms</h2>
+
+</div>
+
+
+<!--List of all rooms-->
+
+<div class="allRoom">
+
+    <!--Individual rooms-->
+
+    {% for room in rooms %}
+
+    <div class="room">
+
+        <div class="nameR">
+            <span>{{room.name}}</span>
+        </div>
+
+        <!--Join-->
+        <a href="{% url 'roomInd' room.slug %}">
+            <div class="join">
+
+                <span>Join</span>
+    
+            </div>
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
